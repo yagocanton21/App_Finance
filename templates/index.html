@@ -1,0 +1,222 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - Controle Financeiro{% endblock %}
+
+{% block content %}
+<div class="dashboard-stats">
+    <div class="dashboard-grid">
+        <div class="card stats-card entrada">
+            <div class="stats-icon">
+                <i class="fas fa-arrow-up"></i>
+            </div>
+            <div class="stats-content">
+                <h3>Entradas</h3>
+                <p class="stats-value" id="total-entradas">R$ 0,00</p>
+            </div>
+        </div>
+        
+        <div class="card stats-card saida">
+            <div class="stats-icon">
+                <i class="fas fa-arrow-down"></i>
+            </div>
+            <div class="stats-content">
+                <h3>Saídas</h3>
+                <p class="stats-value" id="total-saidas">R$ 0,00</p>
+            </div>
+        </div>
+        
+        <div class="card stats-card saldo">
+            <div class="stats-icon">
+                <i class="fas fa-wallet"></i>
+            </div>
+            <div class="stats-content">
+                <h3>Saldo</h3>
+                <p class="stats-value" id="saldo-total">R$ 0,00</p>
+            </div>
+        </div>
+        
+        <div class="card stats-card transacoes">
+            <div class="stats-icon">
+                <i class="fas fa-list"></i>
+            </div>
+            <div class="stats-content">
+                <h3>Total</h3>
+                <p class="stats-value">{{ total }} transações</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Filtros -->
+<div class="card">
+    <h3><i class="fas fa-filter"></i> Filtros</h3>
+    <form method="GET" class="filter-form">
+        <div class="form-group">
+            <label for="busca">Buscar</label>
+            <input type="text" name="busca" id="busca" class="form-control" 
+                   placeholder="Descrição ou categoria..." value="{{ filtros.busca or '' }}">
+        </div>
+        
+        <div class="form-group">
+            <label for="tipo">Tipo</label>
+            <select name="tipo" id="tipo" class="form-control">
+                <option value="">Todos</option>
+                <option value="entrada" {{ 'selected' if filtros.tipo == 'entrada' }}>Entrada</option>
+                <option value="saída" {{ 'selected' if filtros.tipo == 'saída' }}>Saída</option>
+            </select>
+        </div>
+        
+        <div class="form-group">
+            <label for="categoria_id">Categoria</label>
+            <select name="categoria_id" id="categoria_id" class="form-control">
+                <option value="">Todas</option>
+                {% for categoria in categorias %}
+                    <option value="{{ categoria[0] }}" {{ 'selected' if filtros.categoria_id == categoria[0]|string }}>{{ categoria[1] }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        
+        <div class="form-group">
+            <label for="data_inicio">Data Início</label>
+            <input type="date" name="data_inicio" id="data_inicio" class="form-control" value="{{ filtros.data_inicio or '' }}">
+        </div>
+        
+        <div class="form-group">
+            <label for="data_fim">Data Fim</label>
+            <input type="date" name="data_fim" id="data_fim" class="form-control" value="{{ filtros.data_fim or '' }}">
+        </div>
+        
+        <div class="filter-actions">
+            <button type="submit" class="btn"><i class="fas fa-search"></i> Filtrar</button>
+            <a href="{{ url_for('transacao.index') }}" class="btn" style="background: #6c757d;"><i class="fas fa-times"></i> Limpar</a>
+        </div>
+    </form>
+</div>
+
+<div class="card">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 10px;">
+        <h2 style="color: #333; margin: 0;">
+            <i class="fas fa-history"></i> Transações Recentes
+        </h2>
+        <a href="{{ url_for('transacao.nova_transacao') }}" class="btn">
+            <i class="fas fa-plus"></i> Nova Transação
+        </a>
+    </div>
+    
+    {% if transacoes %}
+        <div class="mobile-scroll">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th><i class="fas fa-calendar"></i> Data</th>
+                        <th><i class="fas fa-tag"></i> Tipo</th>
+                        <th><i class="fas fa-dollar-sign"></i> Valor</th>
+                        <th><i class="fas fa-folder"></i> Categoria</th>
+                        <th><i class="fas fa-comment"></i> Descrição</th>
+                        <th><i class="fas fa-cog"></i> Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for transacao in transacoes %}
+                    <tr>
+                        <td>{{ transacao[4] }}</td>
+                        <td>
+                            <span class="badge badge-{{ 'entrada' if transacao[1] == 'entrada' else 'saida' }}">
+                                <i class="fas fa-arrow-{{ 'up' if transacao[1] == 'entrada' else 'down' }}"></i>
+                                {{ transacao[1].title() }}
+                            </span>
+                        </td>
+                        <td style="font-weight: bold; color: {{ '#28a745' if transacao[1] == 'entrada' else '#dc3545' }};">
+                            R$ {{ "%.2f"|format(transacao[2])|replace('.', ',') }}
+                        </td>
+                        <td>{{ transacao[3] }}</td>
+                        <td>{{ transacao[5] or '-' }}</td>
+                        <td>
+                            <a href="{{ url_for('transacao.editar_transacao_form', transacao_id=transacao[0]) }}" class="btn-small btn-edit">
+                                <i class="fas fa-edit"></i> Editar
+                            </a>
+                            <form style="display: inline; margin-left: 5px;" method="POST" action="{{ url_for('transacao.deletar_transacao_route', transacao_id=transacao[0]) }}" onsubmit="return confirm('Tem certeza que deseja deletar esta transação?')">
+                                <button type="submit" class="btn-small btn-delete">
+                                    <i class="fas fa-trash"></i> Deletar
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        
+        <!-- Paginação -->
+        {% if total_pages > 1 %}
+        <div class="pagination">
+            {% if current_page > 1 %}
+                <a href="{{ url_for('transacao.index', page=current_page-1, **filtros) }}" class="btn">
+                    <i class="fas fa-chevron-left"></i> Anterior
+                </a>
+            {% endif %}
+            
+            {% for page_num in range(1, total_pages + 1) %}
+                {% if page_num == current_page %}
+                    <span class="btn active">{{ page_num }}</span>
+                {% elif page_num <= 3 or page_num > total_pages - 3 or (page_num >= current_page - 1 and page_num <= current_page + 1) %}
+                    <a href="{{ url_for('transacao.index', page=page_num, **filtros) }}" class="btn">{{ page_num }}</a>
+                {% elif page_num == 4 and current_page > 5 %}
+                    <span>...</span>
+                {% elif page_num == total_pages - 3 and current_page < total_pages - 4 %}
+                    <span>...</span>
+                {% endif %}
+            {% endfor %}
+            
+            {% if current_page < total_pages %}
+                <a href="{{ url_for('transacao.index', page=current_page+1, **filtros) }}" class="btn">
+                    Próxima <i class="fas fa-chevron-right"></i>
+                </a>
+            {% endif %}
+        </div>
+        <div class="pagination-info">
+            Página {{ current_page }} de {{ total_pages }} ({{ total }} transações)
+        </div>
+        {% endif %}
+    {% else %}
+        <div style="text-align: center; padding: 40px; color: #666;">
+            <i class="fas fa-inbox" style="font-size: 3em; margin-bottom: 20px; opacity: 0.5;"></i>
+            <h3>Nenhuma transação encontrada</h3>
+            <p>Comece adicionando sua primeira transação!</p>
+            <a href="{{ url_for('transacao.nova_transacao') }}" class="btn" style="margin-top: 15px;">
+                <i class="fas fa-plus"></i> Adicionar Transação
+            </a>
+        </div>
+    {% endif %}
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Calcular totais
+    let totalEntradas = 0;
+    let totalSaidas = 0;
+    
+    {% for transacao in transacoes %}
+        {% if transacao[1] == 'entrada' %}
+            totalEntradas += {{ transacao[2] }};
+        {% else %}
+            totalSaidas += {{ transacao[2] }};
+        {% endif %}
+    {% endfor %}
+    
+    const saldo = totalEntradas - totalSaidas;
+    
+    // Atualizar elementos
+    document.getElementById('total-entradas').textContent = 'R$ ' + totalEntradas.toFixed(2).replace('.', ',');
+    document.getElementById('total-saidas').textContent = 'R$ ' + totalSaidas.toFixed(2).replace('.', ',');
+    
+    const saldoElement = document.getElementById('saldo-total');
+    saldoElement.textContent = 'R$ ' + Math.abs(saldo).toFixed(2).replace('.', ',');
+    saldoElement.style.color = saldo >= 0 ? '#28a745' : '#dc3545';
+    
+    if (saldo < 0) {
+        saldoElement.textContent = '-' + saldoElement.textContent;
+    }
+});
+</script>
+{% endblock %}

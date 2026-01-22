@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+
+{% block title %}Editar Transação{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h2>Editar Transação</h2>
+    
+    <form method="POST" action="{{ url_for('transacao.atualizar_transacao_route', transacao_id=transacao[0]) }}">
+        <div class="form-group">
+            <label for="tipo">Tipo:</label>
+            <select name="tipo" id="tipo" required>
+                <option value="entrada" {% if transacao[1] == 'entrada' %}selected{% endif %}>Entrada</option>
+                <option value="saida" {% if transacao[1] == 'saída' %}selected{% endif %}>Saída</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="valor">Valor:</label>
+            <input type="number" name="valor" id="valor" step="0.01" value="{{ transacao[2] }}" required>
+        </div>
+
+        <div class="form-group">
+            <label for="categoria_id">Categoria:</label>
+            <select name="categoria_id" id="categoria_id" required>
+                {% for categoria in categorias %}
+                    <option value="{{ categoria[0] }}" {% if categoria[0] == transacao[3] %}selected{% endif %}>
+                        {{ categoria[1] }}
+                    </option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="data">Data:</label>
+            <input type="date" name="data" id="data" value="{% set parts = transacao[5].split('-') %}{{ parts[2] }}-{{ parts[1] }}-{{ parts[0] }}" required>
+        </div>
+
+        <div class="form-group">
+            <label for="descricao">Descrição:</label>
+            <textarea name="descricao" id="descricao">{{ transacao[6] or '' }}</textarea>
+        </div>
+
+        <button type="submit">Atualizar Transação</button>
+        <a href="{{ url_for('transacao.index') }}" class="btn-secondary">Cancelar</a>
+    </form>
+</div>
+{% endblock %}

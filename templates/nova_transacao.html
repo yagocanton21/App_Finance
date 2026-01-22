@@ -1,0 +1,131 @@
+{% extends "base.html" %}
+
+{% block title %}Nova Transação - Controle Financeiro{% endblock %}
+
+{% block content %}
+<div class="card">
+    <h2 style="color: #333; margin-bottom: 25px;">
+        <i class="fas fa-plus-circle"></i> Nova Transação
+    </h2>
+    
+    <form method="POST" action="{{ url_for('transacao.adicionar_transacao_route') }}">
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px;">
+            <div class="form-group">
+                <label for="tipo">
+                    <i class="fas fa-exchange-alt"></i> Tipo de Transação
+                </label>
+                <select name="tipo" id="tipo" class="form-control" required>
+                    <option value="">Selecione o tipo</option>
+                    <option value="entrada">
+                        <i class="fas fa-arrow-up"></i> Entrada
+                    </option>
+                    <option value="saida">
+                        <i class="fas fa-arrow-down"></i> Saída
+                    </option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label for="valor">
+                    <i class="fas fa-dollar-sign"></i> Valor
+                </label>
+                <input type="number" name="valor" id="valor" class="form-control" 
+                       step="0.01" min="0" placeholder="0,00" required>
+            </div>
+        </div>
+        
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px;">
+            <div class="form-group">
+                <label for="categoria_id">
+                    <i class="fas fa-tag"></i> Categoria
+                </label>
+                <select name="categoria_id" id="categoria_id" class="form-control" required>
+                    <option value="">Selecione uma categoria</option>
+                    {% for categoria in categorias %}
+                        <option value="{{ categoria[0] }}">{{ categoria[1] }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label for="data">
+                    <i class="fas fa-calendar"></i> Data
+                </label>
+                <input type="date" name="data" id="data" class="form-control" required>
+            </div>
+        </div>
+        
+        <div class="form-group">
+            <label for="descricao">
+                <i class="fas fa-comment"></i> Descrição (opcional)
+            </label>
+            <textarea name="descricao" id="descricao" class="form-control" 
+                      rows="3" placeholder="Adicione uma descrição para esta transação..."></textarea>
+        </div>
+        
+        <div style="display: flex; gap: 15px; justify-content: flex-end; margin-top: 30px; flex-wrap: wrap;">
+            <a href="{{ url_for('transacao.index') }}" class="btn" style="background: #6c757d;">
+                <i class="fas fa-times"></i> Cancelar
+            </a>
+            <button type="submit" class="btn">
+                <i class="fas fa-save"></i> Salvar Transação
+            </button>
+        </div>
+    </form>
+</div>
+
+<div class="card">
+    <h3 style="color: #333; margin-bottom: 20px;">
+        <i class="fas fa-lightbulb"></i> Dicas
+    </h3>
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 15px;">
+        <div style="padding: 15px; background: rgba(40, 167, 69, 0.1); border-radius: 10px; border-left: 4px solid #28a745;">
+            <strong style="color: #28a745;">Entradas</strong>
+            <p style="margin: 5px 0 0 0; font-size: 14px; color: #666;">
+                Salário, freelances, vendas, investimentos, etc.
+            </p>
+        </div>
+        <div style="padding: 15px; background: rgba(220, 53, 69, 0.1); border-radius: 10px; border-left: 4px solid #dc3545;">
+            <strong style="color: #dc3545;">Saídas</strong>
+            <p style="margin: 5px 0 0 0; font-size: 14px; color: #666;">
+                Compras, contas, alimentação, transporte, etc.
+            </p>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Definir data atual como padrão
+    const hoje = new Date().toISOString().split('T')[0];
+    document.getElementById('data').value = hoje;
+    
+    // Adicionar estilo dinâmico baseado no tipo
+    const tipoSelect = document.getElementById('tipo');
+    const valorInput = document.getElementById('valor');
+    
+    tipoSelect.addEventListener('change', function() {
+        if (this.value === 'entrada') {
+            valorInput.style.borderColor = '#28a745';
+            valorInput.style.color = '#28a745';
+        } else if (this.value === 'saida') {
+            valorInput.style.borderColor = '#dc3545';
+            valorInput.style.color = '#dc3545';
+        } else {
+            valorInput.style.borderColor = '#e9ecef';
+            valorInput.style.color = '#333';
+        }
+    });
+    
+    // Formatação do valor
+    valorInput.addEventListener('input', function() {
+        let valor = this.value;
+        if (valor && !isNaN(valor)) {
+            this.style.fontWeight = 'bold';
+        } else {
+            this.style.fontWeight = 'normal';
+        }
+    });
+});
+</script>
+{% endblock %}

@@ -1,0 +1,141 @@
+{% extends "base.html" %}
+
+{% block title %}Categorias - Controle Financeiro{% endblock %}
+
+{% block content %}
+<div class="card">
+    <h2 style="color: #333; margin-bottom: 25px;">
+        <i class="fas fa-tags"></i> Gerenciar Categorias
+    </h2>
+    
+    <form method="POST" action="{{ url_for('categoria.adicionar_categoria_route') }}" style="margin-bottom: 30px;">
+        <div style="display: flex; gap: 15px; align-items: end; flex-wrap: wrap;">
+            <div class="form-group" style="flex: 1; min-width: 200px; margin-bottom: 0;">
+                <label for="nome">
+                    <i class="fas fa-tag"></i> Nova Categoria
+                </label>
+                <input type="text" name="nome" id="nome" class="form-control" 
+                       placeholder="Digite o nome da categoria..." required>
+            </div>
+            <button type="submit" class="btn" style="white-space: nowrap;">
+                <i class="fas fa-plus"></i> Adicionar
+            </button>
+        </div>
+    </form>
+</div>
+
+<div class="card">
+    <h3 style="color: #333; margin-bottom: 20px;">
+        <i class="fas fa-list"></i> Categorias Existentes
+    </h3>
+    
+    {% if categorias %}
+        <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 15px;">
+            {% for categoria in categorias %}
+            <div style="padding: 20px; background: linear-gradient(135deg, rgba(102, 126, 234, 0.1), rgba(118, 75, 162, 0.1)); 
+                        border-radius: 12px; border: 1px solid rgba(102, 126, 234, 0.2); 
+                        transition: all 0.3s ease; cursor: pointer;"
+                 onmouseover="this.style.transform='translateY(-3px)'; this.style.boxShadow='0 8px 25px rgba(102, 126, 234, 0.15)'"
+                 onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none'">
+                <div style="display: flex; align-items: center; justify-content: space-between;">
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <div style="width: 40px; height: 40px; background: linear-gradient(45deg, #667eea, #764ba2); 
+                                    border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white;">
+                            <i class="fas fa-tag"></i>
+                        </div>
+                        <div>
+                            <h4 style="margin: 0; color: #333; font-size: 16px;">{{ categoria[1] }}</h4>
+                            <small style="color: #666;">ID: {{ categoria[0] }}</small>
+                        </div>
+                    </div>
+                    <div style="color: #667eea; font-size: 18px;">
+                        <i class="fas fa-folder"></i>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div style="text-align: center; padding: 40px; color: #666;">
+            <i class="fas fa-tags" style="font-size: 3em; margin-bottom: 20px; opacity: 0.5;"></i>
+            <h3>Nenhuma categoria encontrada</h3>
+            <p>Crie sua primeira categoria para organizar suas transações!</p>
+        </div>
+    {% endif %}
+</div>
+
+<div class="card">
+    <h3 style="color: #333; margin-bottom: 20px;">
+        <i class="fas fa-info-circle"></i> Sugestões de Categorias
+    </h3>
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
+        <div style="padding: 15px; background: rgba(40, 167, 69, 0.1); border-radius: 10px; border-left: 4px solid #28a745;">
+            <strong style="color: #28a745;">
+                <i class="fas fa-arrow-up"></i> Receitas
+            </strong>
+            <ul style="margin: 10px 0 0 0; padding-left: 20px; font-size: 14px; color: #666;">
+                <li>Salário</li>
+                <li>Freelance</li>
+                <li>Investimentos</li>
+                <li>Vendas</li>
+            </ul>
+        </div>
+        
+        <div style="padding: 15px; background: rgba(220, 53, 69, 0.1); border-radius: 10px; border-left: 4px solid #dc3545;">
+            <strong style="color: #dc3545;">
+                <i class="fas fa-arrow-down"></i> Despesas Fixas
+            </strong>
+            <ul style="margin: 10px 0 0 0; padding-left: 20px; font-size: 14px; color: #666;">
+                <li>Aluguel</li>
+                <li>Energia</li>
+                <li>Internet</li>
+                <li>Telefone</li>
+            </ul>
+        </div>
+        
+        <div style="padding: 15px; background: rgba(255, 193, 7, 0.1); border-radius: 10px; border-left: 4px solid #ffc107;">
+            <strong style="color: #e0a800;">
+                <i class="fas fa-shopping-cart"></i> Despesas Variáveis
+            </strong>
+            <ul style="margin: 10px 0 0 0; padding-left: 20px; font-size: 14px; color: #666;">
+                <li>Alimentação</li>
+                <li>Transporte</li>
+                <li>Lazer</li>
+                <li>Roupas</li>
+            </ul>
+        </div>
+        
+        <div style="padding: 15px; background: rgba(102, 126, 234, 0.1); border-radius: 10px; border-left: 4px solid #667eea;">
+            <strong style="color: #667eea;">
+                <i class="fas fa-heart"></i> Saúde & Bem-estar
+            </strong>
+            <ul style="margin: 10px 0 0 0; padding-left: 20px; font-size: 14px; color: #666;">
+                <li>Médico</li>
+                <li>Farmácia</li>
+                <li>Academia</li>
+                <li>Terapia</li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const nomeInput = document.getElementById('nome');
+    
+    // Focar no input ao carregar a página
+    nomeInput.focus();
+    
+    // Adicionar efeito visual no input
+    nomeInput.addEventListener('input', function() {
+        if (this.value.length > 0) {
+            this.style.borderColor = '#667eea';
+            this.style.boxShadow = '0 0 0 3px rgba(102, 126, 234, 0.1)';
+        } else {
+            this.style.borderColor = '#e9ecef';
+            this.style.boxShadow = 'none';
+        }
+    });
+});
+</script>
+{% endblock %}
