@@ -1,4 +1,4 @@
-import psycopg2
+import psycopg
 import os
 from dotenv import load_dotenv
 
@@ -9,13 +9,8 @@ def create_tables():
     Cria as tabelas necessárias no banco PostgreSQL
     """
     try:
-        conn = psycopg2.connect(
-            host=os.getenv('DB_HOST', 'localhost'),
-            port=os.getenv('DB_PORT', '5432'),
-            database=os.getenv('DB_NAME', 'financas_db'),
-            user=os.getenv('DB_USER', 'username'),
-            password=os.getenv('DB_PASSWORD', 'password')
-        )
+        conninfo = f"host={os.getenv('DB_HOST', 'localhost')} port={os.getenv('DB_PORT', '5432')} dbname={os.getenv('DB_NAME', 'financas_db')} user={os.getenv('DB_USER', 'username')} password={os.getenv('DB_PASSWORD', 'password')}"
+        conn = psycopg.connect(conninfo)
         
         cur = conn.cursor()
         
@@ -61,7 +56,7 @@ def create_tables():
         
         print("Tabelas criadas com sucesso!")
         
-    except psycopg2.Error as e:
+    except psycopg.Error as e:
         print(f"Erro ao criar tabelas: {e}")
 
 if __name__ == "__main__":
