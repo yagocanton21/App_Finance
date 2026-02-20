@@ -19,7 +19,36 @@ Sistema simples para controle de finanças pessoais desenvolvido em Flask com ar
 
 ## Como executar
 
-### Com Docker (Recomendado)
+### Deploy no Vercel (Produção)
+
+1. Crie uma conta no [Vercel](https://vercel.com)
+
+2. Instale o Vercel CLI:
+```bash
+npm i -g vercel
+```
+
+3. Configure um banco PostgreSQL (recomendado: [Neon](https://neon.tech), [Supabase](https://supabase.com) ou [Railway](https://railway.app))
+
+4. No diretório do projeto, execute:
+```bash
+vercel
+```
+
+5. Configure as variáveis de ambiente no painel do Vercel:
+   - `DB_HOST`
+   - `DB_PORT`
+   - `DB_NAME`
+   - `DB_USER`
+   - `DB_PASSWORD`
+   - `SECRET_KEY`
+
+6. Faça o deploy:
+```bash
+vercel --prod
+```
+
+### Com Docker (Recomendado para desenvolvimento)
 
 1. Certifique-se de ter Docker e Docker Compose instalados.
 
@@ -50,7 +79,7 @@ pip install -r requirements.txt
 
 4. Execute o script de inicialização do banco:
 ```bash
-python init_db.py
+python scripts/init_db.py
 ```
 
 5. Execute a aplicação:
@@ -63,6 +92,8 @@ python -c "from app import create_app; app = create_app(); app.run(host='0.0.0.0
 ## Estrutura do projeto (MVC)
 
 ```
+├── api/
+│   └── index.py             # Ponto de entrada Vercel
 ├── app/
 │   ├── __init__.py          # Configuração da aplicação Flask
 │   ├── controllers/         # Controladores (lógica de rotas)
@@ -72,14 +103,14 @@ python -c "from app import create_app; app = create_app(); app.run(host='0.0.0.0
 ├── templates/               # Templates HTML
 ├── Dockerfile               # Configuração Docker
 ├── docker-compose.yml       # Orquestração de containers
-├── init_db.py               # Inicialização do banco
+├── vercel.json              # Configuração Vercel
 ├── requirements.txt         # Dependências Python
 └── README.md
 ```
 
 ## Variáveis de ambiente
 
-Configure no arquivo `.env`:
+Configure no arquivo `.env` (local) ou no painel do Vercel (produção):
 
 - `DB_HOST`: Host do PostgreSQL
 - `DB_PORT`: Porta do PostgreSQL
